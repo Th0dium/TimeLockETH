@@ -118,6 +118,24 @@ input::placeholder {
   opacity: 1;
 }
 
+/* AppKit Dark Mode Styles */
+appkit-button {
+  --w3m-color-mix-percentage: 0% !important;
+}
+
+/* Ensure AppKit respects our theme */
+@media (prefers-color-scheme: dark) {
+  appkit-button {
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  appkit-button {
+    color-scheme: light;
+  }
+}
+
 /* Mobile Optimizations */
 @media (max-width: 640px) {
   button, input, select, textarea {

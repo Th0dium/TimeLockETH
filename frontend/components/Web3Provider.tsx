@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { createAppKit } from '@reown/appkit/react'
@@ -20,13 +21,25 @@ const metadata = {
   icons: [`${appUrl}/icon.png`]
 }
 
-// Create the AppKit modal
+// Detect dark mode preference
+const getDarkModePreference = () => {
+  if (typeof window === 'undefined') return 'light'
+
+  // Check if user has dark mode enabled in browser/OS
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark'
+  }
+  return 'light'
+}
+
+// Create the AppKit modal with dark mode support
 createAppKit({
   adapters: [wagmiAdapter],
   projectId,
   networks: [sepolia],
   defaultNetwork: sepolia,
   metadata,
+  themeMode: getDarkModePreference(),
   features: {
     analytics: false
   }
