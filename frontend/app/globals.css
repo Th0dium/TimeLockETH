@@ -118,6 +118,20 @@ input::placeholder {
   opacity: 1;
 }
 
+/* Tab Navigation Styles */
+nav.flex button.btn {
+  flex: 1 0 auto;
+  min-width: fit-content;
+  white-space: nowrap;
+  transition: all 150ms ease;
+}
+
+@media (min-width: 640px) {
+  nav.flex button.btn {
+    flex: 0 1 auto;
+  }
+}
+
 /* AppKit Dark Mode Styles */
 appkit-button {
   --w3m-color-mix-percentage: 0% !important;

@@ -15,7 +15,10 @@
       "Bash(wsl bash -c \"chmod +x /mnt/c/Dev/TimeLockETH/.wsl-node.sh && /mnt/c/Dev/TimeLockETH/.wsl-node.sh node --version\")",
       "Bash(wsl bash:*)",
       "Bash(wsl /home/thodium/.local/share/solana/install/active_release/bin/solana:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npm run build:*)",
+      "Bash(powershell.exe -Command \"cd ''c:\\Dev\\TimeLockETH\\frontend''; npm run build 2>&1 | Select-Object -Last 30\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem -Path ''''c:\\Dev'''' -Directory\")"
     ],
     "deny": [],
     "ask": []
