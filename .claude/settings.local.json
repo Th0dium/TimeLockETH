@@ -3,7 +3,18 @@
     "allow": [
       "Bash(dir:*)",
       "Bash(nul)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(powershell.exe -Command \"cd C:\\Dev\\TimeLockETH; npx hardhat test\")",
+      "Bash(powershell.exe -Command \"cd C:\\Dev\\TimeLockETH; node --version\")",
+      "Bash(npx hardhat test)",
+      "Bash(wsl bash -c \"cd /mnt/c/Dev/TimeLockETH && npx hardhat test\")",
+      "Bash(wsl bash -c \"cd /mnt/c/Dev/TimeLockETH && npm install\")",
+      "Bash(wsl bash -c \"cd /mnt/c/Dev/TimeLockETH && npm install --legacy-peer-deps\")",
+      "Bash(wsl bash -c \"chmod +x /mnt/c/Dev/TimeLockETH/.wsl-node.sh && /mnt/c/Dev/TimeLockETH/.wsl-node.sh node --version\")",
+      "Bash(wsl bash:*)",
+      "Bash(wsl /home/thodium/.local/share/solana/install/active_release/bin/solana:*)"
     ],
     "deny": [],
     "ask": []

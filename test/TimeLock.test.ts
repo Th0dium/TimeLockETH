@@ -22,11 +22,14 @@ describe("TimeLock", function () {
       const depositAmount = ethers.parseEther("1.0");
       const lockDuration = 3600; // 1 giờ
 
-      await expect(
-        timeLock.connect(user1).deposit(lockDuration, { value: depositAmount })
-      )
+      const tx = await timeLock.connect(user1).deposit(lockDuration, { value: depositAmount });
+      const receipt = await tx.wait();
+      const block = await ethers.provider.getBlock(receipt!.blockNumber);
+      const expectedUnlockTime = block!.timestamp + lockDuration;
+
+      await expect(tx)
         .to.emit(timeLock, "Deposited")
-        .withArgs(user1.address, depositAmount, await time.latest() + lockDuration + 1, 0);
+        .withArgs(user1.address, depositAmount, expectedUnlockTime, 0);
 
       const lockCount = await timeLock.getLockCount(user1.address);
       expect(lockCount).to.equal(1);

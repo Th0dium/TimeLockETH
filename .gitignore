@@ -18,3 +18,12 @@
 
 # Hardhat coverage reports
 /coverage
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
