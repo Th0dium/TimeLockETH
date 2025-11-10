@@ -9,11 +9,15 @@ import { wagmiAdapter, projectId } from '../utils/wagmi'
 const queryClient = new QueryClient()
 
 // Set up metadata for the app
+const appUrl = typeof window !== 'undefined'
+  ? `${window.location.protocol}//${window.location.host}`
+  : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
 const metadata = {
   name: 'TimeLock ETH',
   description: 'Time-lock your ETH with smart contracts on Sepolia testnet',
-  url: 'https://timelocketh.app', // Replace with your actual domain
-  icons: ['https://timelocketh.app/icon.png'] // Replace with your actual icon
+  url: appUrl,
+  icons: [`${appUrl}/icon.png`]
 }
 
 // Create the AppKit modal

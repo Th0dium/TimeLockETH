@@ -14,7 +14,8 @@
       "Bash(wsl bash -c \"cd /mnt/c/Dev/TimeLockETH && npm install --legacy-peer-deps\")",
       "Bash(wsl bash -c \"chmod +x /mnt/c/Dev/TimeLockETH/.wsl-node.sh && /mnt/c/Dev/TimeLockETH/.wsl-node.sh node --version\")",
       "Bash(wsl bash:*)",
-      "Bash(wsl /home/thodium/.local/share/solana/install/active_release/bin/solana:*)"
+      "Bash(wsl /home/thodium/.local/share/solana/install/active_release/bin/solana:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
