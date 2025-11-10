@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { WalletButton } from '../components/WalletButton'
 import { CreateVaultForm } from '../components/CreateVaultForm'
+import { WithdrawVaults } from '../components/WithdrawVaults'
+import { AdministrateVaults } from '../components/AdministrateVaults'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'create' | 'withdraw' | 'administrate'>('create')
@@ -37,8 +39,8 @@ export default function Home() {
 
       <main className="w-full max-w-4xl mx-auto">
         {activeTab === 'create' && (
-          <div className="space-y-6">
-            <div>
+          <div>
+            <div className="mb-6">
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">Time-Lock Your Ethereum</h2>
               <p className="text-muted">
                 Lock ETH in a smart contract vault on Sepolia testnet.
@@ -46,8 +48,8 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="lg:col-span-2">
                 <CreateVaultForm />
               </div>
 
@@ -107,9 +109,7 @@ export default function Home() {
                 View vaults where you are the receiver and withdraw funds after the unlock time.
               </p>
             </div>
-            <div className="border rounded-lg p-6 text-center text-muted">
-              <p>Withdraw functionality coming soon...</p>
-            </div>
+            <WithdrawVaults />
           </div>
         )}
 
@@ -121,9 +121,7 @@ export default function Home() {
                 Manage vaults where you are set as the authority. Update receiver address and unlock times.
               </p>
             </div>
-            <div className="border rounded-lg p-6 text-center text-muted">
-              <p>Administration functionality coming soon...</p>
-            </div>
+            <AdministrateVaults />
           </div>
         )}
       </main>
