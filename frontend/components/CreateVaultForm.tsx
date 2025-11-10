@@ -52,11 +52,11 @@ export function CreateVaultForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 bg-gray-800 rounded-lg space-y-4">
-      <h2 className="text-2xl font-bold mb-4">Create Time-Locked Vault</h2>
+    <form onSubmit={handleSubmit} className="border rounded-lg p-4 space-y-3">
+      <h2 className="text-xl font-bold mb-3">Create Time-Locked Vault</h2>
 
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-1">
           Receiver Address *
         </label>
         <input
@@ -64,13 +64,13 @@ export function CreateVaultForm() {
           value={receiver}
           onChange={(e) => setReceiver(e.target.value)}
           placeholder="0x..."
-          className="w-full px-4 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border px-3 py-2 rounded-md"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-1">
           Amount (ETH) *
         </label>
         <input
@@ -79,13 +79,13 @@ export function CreateVaultForm() {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="0.1"
-          className="w-full px-4 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border px-3 py-2 rounded-md"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-1">
           Lock Duration (days) *
         </label>
         <input
@@ -93,13 +93,13 @@ export function CreateVaultForm() {
           value={lockDays}
           onChange={(e) => setLockDays(e.target.value)}
           placeholder="30"
-          className="w-full px-4 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border px-3 py-2 rounded-md"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium mb-2">
+        <label className="block text-sm font-medium mb-1">
           Authority Address (optional)
         </label>
         <input
@@ -107,7 +107,7 @@ export function CreateVaultForm() {
           value={authority}
           onChange={(e) => setAuthority(e.target.value)}
           placeholder="0x... (leave empty for no authority)"
-          className="w-full px-4 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border px-3 py-2 rounded-md"
         />
       </div>
 
@@ -154,15 +154,15 @@ export function CreateVaultForm() {
       <button
         type="submit"
         disabled={isPending || isConfirming}
-        className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 rounded-md font-semibold transition-colors"
+        className="btn btn--solid w-full"
       >
         {isPending ? 'Waiting for approval...' : isConfirming ? 'Creating vault...' : 'Create Vault'}
       </button>
 
       {isSuccess && (
-        <div className="p-4 bg-green-900/30 border border-green-500 rounded-md">
-          <p className="text-green-400">Vault created successfully!</p>
-          <p className="text-sm text-gray-400 mt-1">Tx: {hash}</p>
+        <div className="p-3 border border-emerald-500 rounded-md bg-emerald-500/10">
+          <p className="text-emerald-500 font-medium">Vault created successfully!</p>
+          <p className="text-sm text-muted mt-1 break-all">Tx: {hash}</p>
         </div>
       )}
     </form>

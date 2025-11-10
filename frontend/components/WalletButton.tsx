@@ -1,7 +1,16 @@
 'use client'
 
-import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { useAppKit } from '@reown/appkit/react'
 
 export function WalletButton() {
-  return <ConnectButton />
+  const { open } = useAppKit()
+
+  return (
+    <button
+      onClick={() => open()}
+      className="btn btn--solid"
+    >
+      <appkit-button />
+    </button>
+  )
 }
