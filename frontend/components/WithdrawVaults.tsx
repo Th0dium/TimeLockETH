@@ -1,64 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
-import { formatCountdown } from '../utils/timeUtils'
-
-interface Vault {
-  address: string
-  amount: string
-  receiver: string
-  authority: string
-  unlockTime: number
-  claimed: boolean
-}
 
 export function WithdrawVaults() {
-  const { address, isConnected } = useAccount()
-  const [vaults, setVaults] = useState<Vault[]>([])
-  const [loading, setLoading] = useState(false)
-  const [nowSec, setNowSec] = useState(Math.floor(Date.now() / 1000))
-  const [cooldownUntil, setCooldownUntil] = useState<number | null>(null)
-
-  // Update current time every second for countdown
-  useEffect(() => {
-    const id = setInterval(() => setNowSec(Math.floor(Date.now() / 1000)), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  const fetchVaults = async () => {
-    if (!address) return
-    setLoading(true)
-    try {
-      // TODO: Fetch vaults where user is receiver from contract
-      // This is a placeholder - implement actual contract reading
-      setVaults([])
-    } catch (error) {
-      console.error('Failed to fetch vaults:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleRefresh = async () => {
-    const now = Date.now()
-    if (cooldownUntil && now < cooldownUntil) return
-
-    setCooldownUntil(now + 5000)
-    setTimeout(() => setCooldownUntil(null), 5000)
-    await fetchVaults()
-  }
-
-  const handleWithdraw = async (vault: Vault) => {
-    if (!address) return
-    try {
-      // TODO: Implement withdrawal transaction
-      console.log('Withdrawing from vault:', vault.address)
-    } catch (error) {
-      console.error('Withdrawal failed:', error)
-      alert('Withdrawal failed: ' + (error instanceof Error ? error.message : String(error)))
-    }
-  }
+  const { isConnected } = useAccount()
 
   if (!isConnected) {
     return (
@@ -70,79 +15,50 @@ export function WithdrawVaults() {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 items-center justify-center">
-        <button
-          disabled={cooldownUntil ? Date.now() < cooldownUntil : false}
-          onClick={handleRefresh}
-          className="btn disabled:opacity-50"
+      <div className="border rounded-lg p-6 space-y-4">
+        <div className="bg-yellow-500/10 border border-yellow-500 rounded-lg p-4">
+          <h3 className="font-semibold text-yellow-700 dark:text-yellow-400 mb-2">Coming Soon</h3>
+          <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
+            To enable finding vaults where you are the receiver, this feature requires event indexing infrastructure.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold">How it will work:</h4>
+          <ol className="space-y-2 text-sm text-muted list-decimal list-inside">
+            <li>Contract emits <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">VaultCreated</code> events with indexed fields</li>
+            <li>Events are indexed by The Graph or similar service</li>
+            <li>Frontend queries the subgraph to find all vaults where you are the receiver</li>
+            <li>You can then withdraw funds after unlock time</li>
+          </ol>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold">Current Workaround:</h4>
+          <p className="text-sm text-muted">
+            If someone creates a vault with you as the receiver, ask them to provide the vault ID or check the transaction hash on Etherscan to find the vault details.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h4 className="font-semibold">Technical Details:</h4>
+          <p className="text-sm text-muted">
+            Unlike Solana, Ethereum doesn't provide a native way to query contract storage by value. Instead, we rely on events:
+          </p>
+          <ul className="space-y-1 text-sm text-muted list-disc list-inside">
+            <li>Solana: PDAs + <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">getProgramAccounts</code> with memcmp filters</li>
+            <li>Ethereum: Events + The Graph indexing</li>
+          </ul>
+        </div>
+
+        <a
+          href="https://thegraph.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-link hover:underline text-sm inline-block mt-2"
         >
-          Refresh
-        </button>
-        {loading && <span className="text-muted">Loading…</span>}
-      </div>
-
-      <div className="grid gap-3">
-        {vaults.map((vault) => {
-          const remainingSeconds = vault.unlockTime - nowSec
-          const isUnlocked = remainingSeconds <= 0
-          const canWithdraw = isUnlocked && !vault.claimed
-
-          return (
-            <div key={vault.address} className="border rounded-lg p-4 space-y-2">
-              <div>
-                <label className="text-xs text-muted">Vault Address</label>
-                <div className="break-all text-sm text-foreground">{vault.address}</div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-muted">Amount</label>
-                  <div className="text-sm font-semibold">{parseFloat(vault.amount).toFixed(4)} ETH</div>
-                </div>
-                <div>
-                  <label className="text-xs text-muted">Status</label>
-                  <div className="text-sm font-semibold">
-                    {vault.claimed ? (
-                      <span className="text-gray-500">Withdrawn</span>
-                    ) : isUnlocked ? (
-                      <span className="text-emerald-500">Ready</span>
-                    ) : (
-                      <span className="text-yellow-500">Locked</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {!isUnlocked && (
-                <div>
-                  <label className="text-xs text-muted">Time Remaining</label>
-                  <div className="text-sm font-mono">{formatCountdown(remainingSeconds)}</div>
-                </div>
-              )}
-
-              <div>
-                <label className="text-xs text-muted">Unlock Time</label>
-                <div className="text-sm">
-                  {new Date(vault.unlockTime * 1000).toLocaleString()}
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleWithdraw(vault)}
-                disabled={!canWithdraw}
-                className="btn btn--solid w-full disabled:opacity-50"
-              >
-                {vault.claimed ? 'Already Withdrawn' : isUnlocked ? 'Withdraw' : 'Locked'}
-              </button>
-            </div>
-          )
-        })}
-
-        {vaults.length === 0 && !loading && (
-          <div className="text-sm text-muted text-center py-8">
-            No vaults found where you are the receiver
-          </div>
-        )}
+          Learn more about The Graph →
+        </a>
       </div>
     </div>
   )

@@ -10,7 +10,7 @@ export function CreateVaultForm() {
   const { address } = useAccount()
   const [receiver, setReceiver] = useState('')
   const [authority, setAuthority] = useState('')
-  const [amount, setAmount] = useState('0.1')
+  const [amount, setAmount] = useState('0.01')
   const [unlockDate, setUnlockDate] = useState('')
   const [unlockTime, setUnlockTime] = useState('')
   const [tzOffset, setTzOffset] = useState(7 * 60) // Default GMT+7
@@ -51,6 +51,9 @@ export function CreateVaultForm() {
       return
     }
 
+    // Contract expects duration in seconds, not timestamp
+    const durationSeconds = BigInt(tsNum - nowNum)
+
     writeContract({
       address: TIMELOCK_ADVANCED_ADDRESS,
       abi: TIMELOCK_ADVANCED_ABI,
@@ -58,7 +61,7 @@ export function CreateVaultForm() {
       args: [
         receiver as `0x${string}`,
         authority && authority !== '' ? authority as `0x${string}` : '0x0000000000000000000000000000000000000000' as `0x${string}`,
-        BigInt(tsNum),
+        durationSeconds,
         authorityRights
       ],
       value: parseEther(amount),
@@ -69,8 +72,52 @@ export function CreateVaultForm() {
     if (!address) return
     setLoadingVaults(true)
     try {
-      // TODO: Fetch vaults where user is creator from contract
-      setCreatedVaults([])
+      // Dynamically import viem for contract reading
+      const { createPublicClient, http } = await import('viem')
+      const { sepolia } = await import('viem/chains')
+
+      const publicClient = createPublicClient({
+        chain: sepolia,
+        transport: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL),
+      })
+
+      // Get total vault count for this creator
+      const vaultCount = await publicClient.readContract({
+        address: TIMELOCK_ADVANCED_ADDRESS,
+        abi: TIMELOCK_ADVANCED_ABI,
+        functionName: 'vaultCount',
+        args: [address],
+      }) as bigint
+
+      const vaults: any[] = []
+
+      // Fetch each vault by ID
+      for (let i = 0n; i < vaultCount; i++) {
+        try {
+          const vaultInfo = await publicClient.readContract({
+            address: TIMELOCK_ADVANCED_ADDRESS,
+            abi: TIMELOCK_ADVANCED_ABI,
+            functionName: 'getVaultInfo',
+            args: [address, i],
+          }) as any
+
+          vaults.push({
+            id: i.toString(),
+            creator: vaultInfo[0],
+            authority: vaultInfo[1],
+            receiver: vaultInfo[2],
+            amount: vaultInfo[3],
+            unlockTime: vaultInfo[4],
+            authorityRights: vaultInfo[5],
+            withdrawn: vaultInfo[6],
+            isUnlocked: vaultInfo[7],
+          })
+        } catch (err) {
+          console.error(`Failed to fetch vault ${i}:`, err)
+        }
+      }
+
+      setCreatedVaults(vaults)
     } catch (error) {
       console.error('Failed to fetch vaults:', error)
     } finally {
@@ -270,19 +317,46 @@ export function CreateVaultForm() {
         <div className="grid gap-3">
           {createdVaults.length > 0 ? (
             createdVaults.map((vault) => (
-              <div key={vault.address} className="border rounded-lg p-3 space-y-2 text-sm">
-                <div className="break-all text-muted">{vault.address}</div>
+              <div key={vault.id} className="border rounded-lg p-3 space-y-2 text-sm">
                 <div>
-                  Amount: <span className="font-semibold">{parseFloat(vault.amount).toFixed(4)} ETH</span>
+                  <label className="text-xs text-muted">Vault ID</label>
+                  <div className="font-semibold">#{vault.id}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-muted">Amount</label>
+                    <div className="font-semibold">
+                      {(Number(vault.amount) / 1e18).toFixed(4)} ETH
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted">Status</label>
+                    <div className="font-semibold">
+                      {vault.withdrawn ? (
+                        <span className="text-gray-500">Withdrawn</span>
+                      ) : vault.isUnlocked ? (
+                        <span className="text-emerald-500">Unlocked</span>
+                      ) : (
+                        <span className="text-yellow-500">Locked</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <div>
-                  Unlock: <span>{new Date(vault.unlockTime * 1000).toLocaleString()}</span>
+                  <label className="text-xs text-muted">Receiver</label>
+                  <div className="break-all text-xs font-mono">{vault.receiver}</div>
+                </div>
+                <div>
+                  <label className="text-xs text-muted">Unlock Time</label>
+                  <div className="text-xs">
+                    {new Date(Number(vault.unlockTime) * 1000).toLocaleString()}
+                  </div>
                 </div>
               </div>
             ))
           ) : (
             <div className="text-sm text-muted text-center py-6">
-              No vaults found yet
+              No vaults created yet
             </div>
           )}
         </div>
